@@ -8,6 +8,23 @@ on:
   workflow_dispatch:
 
 jobs:
+  test-gates:
+    runs-on: ubuntu-latest
+    outputs:
+      has-openai-key: ${{ steps.openai.outputs.present }}
+    steps:
+      - name: Check OpenAI credentials availability
+        id: openai
+        shell: bash
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [[ -n "$OPENAI_API_KEY" ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
   format:
     runs-on: ubuntu-latest
     steps:
@@ -121,6 +138,8 @@ jobs:
         run: npm run test --workspace=@getpaseo/app
 
   playwright:
+    needs: [test-gates]
+    if: ${{ needs.test-gates.outputs.has-openai-key == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
