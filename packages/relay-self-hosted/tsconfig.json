@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2020", "DOM"],
+    "paths": {
+      "@getpaseo/relay/cloudflare": ["../relay/src/cloudflare-adapter.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}

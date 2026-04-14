@@ -1,0 +1,53 @@
+services:
+  relay:
+    image: paseo-relay-self-hosted
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: relay-self-hosted
+    ports:
+      - "${PASEO_BIND_HOST:-127.0.0.1}:${PASEO_RELAY_PORT:-8787}:8080"
+    volumes:
+      - relay-data:/var/lib/paseo-relay/do
+
+  server:
+    image: paseo-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    depends_on:
+      relay:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PASEO_HOME: /var/lib/paseo
+      PASEO_LISTEN: 0.0.0.0:6767
+      PASEO_RELAY_ENABLED: "1"
+      PASEO_RELAY_ENDPOINT: relay:8080
+      PASEO_RELAY_PUBLIC_ENDPOINT: ${PASEO_RELAY_PUBLIC_ENDPOINT:-localhost:8787}
+      PASEO_APP_BASE_URL: ${PASEO_APP_BASE_URL:-http://localhost:8080}
+      PASEO_CORS_ORIGINS: ${PASEO_CORS_ORIGINS:-http://localhost:8080}
+      PASEO_ALLOWED_HOSTS: ${PASEO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+    ports:
+      - "${PASEO_BIND_HOST:-127.0.0.1}:${PASEO_DAEMON_PORT:-6767}:6767"
+    volumes:
+      - server-data:/var/lib/paseo
+
+  app:
+    image: paseo-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    environment:
+      PASEO_DAEMON_PUBLIC_ENDPOINT: ${PASEO_DAEMON_PUBLIC_ENDPOINT:-localhost:6767}
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "${PASEO_BIND_HOST:-127.0.0.1}:${PASEO_APP_PORT:-8080}:80"
+
+volumes:
+  relay-data:
+  server-data:

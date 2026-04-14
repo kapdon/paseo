@@ -1,0 +1,18 @@
+{
+  "name": "@getpaseo/relay-self-hosted",
+  "version": "0.1.55-rc.2",
+  "private": true,
+  "type": "module",
+  "description": "Self-hosted deployment wrapper for the Paseo relay.",
+  "dependencies": {
+    "@getpaseo/relay": "0.1.55-rc.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.71.0"
+  },
+  "scripts": {
+    "prebuild": "npm --prefix ../.. run build --workspace=@getpaseo/relay",
+    "build": "wrangler deploy --dry-run --outdir dist-oci",
+    "typecheck": "tsc --noEmit"
+  }
+}

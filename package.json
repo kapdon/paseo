@@ -8,6 +8,7 @@
     "packages/server",
     "packages/app",
     "packages/relay",
+    "packages/relay-self-hosted",
     "packages/website",
     "packages/desktop",
     "packages/cli"
