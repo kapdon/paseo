@@ -39,6 +39,17 @@ cp .env.docker.example .env
 docker compose up --build
 ```
 
+## Publish images to GHCR
+
+This repo now includes `.github/workflows/publish-docker-images.yml`.
+
+- On pushes to `main`, it builds and publishes:
+  - `ghcr.io/<owner>/paseo-app`
+  - `ghcr.io/<owner>/paseo-server`
+  - `ghcr.io/<owner>/paseo-relay-self-hosted`
+- On pull requests, it builds the same targets without pushing.
+- On `workflow_dispatch`, you can choose whether to push images.
+
 Published host ports:
 
 - app web UI: `http://localhost:8080`
