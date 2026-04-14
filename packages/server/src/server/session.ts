@@ -4718,6 +4718,7 @@ export class Session {
     const { cwd, requestId } = msg;
 
     try {
+      await this.workspaceGitService.refresh(cwd, { priority: "high" });
       const snapshot = await this.workspaceGitService.getSnapshot(cwd);
       this.emit({
         type: "checkout_pr_status_response",

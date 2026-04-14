@@ -15,7 +15,7 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.event_name != 'release' || (!github.event.release.prerelease && !github.event.release.draft) }}
+    if: ${{ (github.event_name != 'release' || (!github.event.release.prerelease && !github.event.release.draft)) && secrets.CLOUDFLARE_API_TOKEN != '' }}
     runs-on: ubuntu-latest
 
     steps:
