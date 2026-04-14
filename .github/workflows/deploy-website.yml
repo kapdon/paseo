@@ -14,8 +14,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  deploy-gates:
+    runs-on: ubuntu-latest
+    outputs:
+      has-cloudflare-token: ${{ steps.cloudflare.outputs.present }}
+
+    steps:
+      - name: Check Cloudflare credentials availability
+        id: cloudflare
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -n "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
-    if: ${{ (github.event_name != 'release' || (!github.event.release.prerelease && !github.event.release.draft)) && secrets.CLOUDFLARE_API_TOKEN != '' }}
+    needs: [deploy-gates]
+    if: ${{ (github.event_name != 'release' || (!github.event.release.prerelease && !github.event.release.draft)) && needs.deploy-gates.outputs.has-cloudflare-token == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
